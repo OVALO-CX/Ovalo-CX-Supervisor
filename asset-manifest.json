@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/Ovalo-CX-Supervisor/static/css/main.e6c13ad2.css",
+    "main.js": "/Ovalo-CX-Supervisor/static/js/main.38d7ebfa.js",
+    "static/js/239.4cd860a8.chunk.js": "/Ovalo-CX-Supervisor/static/js/239.4cd860a8.chunk.js",
+    "static/js/977.aab6afa5.chunk.js": "/Ovalo-CX-Supervisor/static/js/977.aab6afa5.chunk.js",
+    "static/js/553.4c38e944.chunk.js": "/Ovalo-CX-Supervisor/static/js/553.4c38e944.chunk.js",
+    "static/js/453.419a5d54.chunk.js": "/Ovalo-CX-Supervisor/static/js/453.419a5d54.chunk.js",
+    "index.html": "/Ovalo-CX-Supervisor/index.html",
+    "main.e6c13ad2.css.map": "/Ovalo-CX-Supervisor/static/css/main.e6c13ad2.css.map",
+    "main.38d7ebfa.js.map": "/Ovalo-CX-Supervisor/static/js/main.38d7ebfa.js.map",
+    "239.4cd860a8.chunk.js.map": "/Ovalo-CX-Supervisor/static/js/239.4cd860a8.chunk.js.map",
+    "553.4c38e944.chunk.js.map": "/Ovalo-CX-Supervisor/static/js/553.4c38e944.chunk.js.map",
+    "453.419a5d54.chunk.js.map": "/Ovalo-CX-Supervisor/static/js/453.419a5d54.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.e6c13ad2.css",
+    "static/js/main.38d7ebfa.js"
+  ]
+}
