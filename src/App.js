@@ -9,8 +9,6 @@ import AuthCallback from './auth-components/AuthCallback';
 import LoginButton from './auth-components/LoginButton';
 //import { io } from 'socket.io-client';
 
-
-
 //import AuthToken from './AuthToken'; // Importer le composant pour récupérer le jeton d'accès
 //import RealTimeUpdates from './RealTimeUpdates';
 //import GetUsers from './GetUsers';
