@@ -44,7 +44,8 @@ function App() {
         
       </div>
       <div className="App">
-        <h1>Application de test en temps réel</h1>
+        {/*<h1>Application de test en temps réel</h1>*/}
+        <h1>Ovalo CX Supervisor</h1>
         {/*<RealTimeUpdates />*/}
       </div>
       {/* Utilisation de Routes à la place de Switch */}

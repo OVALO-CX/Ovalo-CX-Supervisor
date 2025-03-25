@@ -216,6 +216,15 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
         <CardContent sx={{ display: "flex", justifyContent: "space-between", fontSize: `${fontSize}px`, }}>
           <Typography level="h6">{data?.name || `Card ${id}`}</Typography>
 
+
+{/* 📌 Affichage du bon composant selon `componentName` */}
+{data?.data.widgetType === "grid" ? (
+            <GetUserTable data={data}/>
+          ) : (
+            <Typography>Aucun contenu disponible</Typography>
+          )}
+
+
         <div style={{ position: "absolute", top: 0, right: 0, display: "flex", alignItems: "flex-start", flexDirection: "row", }}>
           <ExportButton data={tableData} />          
           {/*<ExportButton onClick={() => onExport(id)}/>*/}
