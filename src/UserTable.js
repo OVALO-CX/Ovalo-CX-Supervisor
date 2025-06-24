@@ -32,7 +32,7 @@ import { formControlClasses } from "@mui/material";
           }
         );
 
-        console.log("✅ Réponse reçue dans UserTable :", response.data);
+        console.log("✅ Réponse reçue dans QueueTable :", response.data);
         //setData(response.data.entities.map(user => ({
         const formattedData = response.data.entities.map((user) => ({
           ...user,
@@ -42,7 +42,7 @@ import { formControlClasses } from "@mui/material";
           phoneNumber: user.addresses && user.addresses.length > 0 ? user.addresses[0].address : null,
           mediaType: user.addresses && user.addresses.length > 0 ? user.addresses[0].mediaType : null,
           type: user.addresses && user.addresses.length > 0 ? user.addresses[0].type : null,
-          countryCode: user.addresses && user.addresses.length > 0 ? user.addresses[0].countryCode : null
+          countryCode: user.addresses && user.addresses.length > 0 ? user.addresses[0].countryCode : null      
        // })));
         }));
 
