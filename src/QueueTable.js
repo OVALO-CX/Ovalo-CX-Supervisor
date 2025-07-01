@@ -37,7 +37,7 @@ import { formControlClasses } from "@mui/material";
         const formattedData = response.data.entities.map((queue) => ({
           ...queue,
           queueName: queue.name ? queue.name : null,
-          queuedivision: queue.division ? queue.division.name : null,
+          divisionName: queue.division ? queue.division.name : null,
           queueUserMemberCount: queue.userMemberCount ? queue.userMemberCount : null
        // })));
         }));
@@ -67,17 +67,9 @@ import { formControlClasses } from "@mui/material";
   const titles = useMemo(
     () => [
       { accessorKey: "name", header: "Nom", size: 120 },
-      { accessorKey: "title", header: "Titre", size: 120 },
-      { accessorKey: "email", header: "Email", size: 120 },
-      { accessorKey: "state", header: "État", size: 120 },
-      { accessorKey: "department", header: "Département", size: 120 },
-      { accessorKey: "presence", header: "Présence", size: 120 },
-      { accessorKey: "routingStatus", header: "Statut", size: 120 },
       { accessorKey: "divisionName", header: "Division", size: 120 },
-      { accessorKey: "phoneNumber", header: "Téléphone", size: 120 },
-      { accessorKey: "mediaType", header: "Type Média", size: 120 },
-      { accessorKey: "type", header: "Type", size: 120 },
-      { accessorKey: "countryCode", header: "Code Pays", size: 120 },
+      { accessorKey: "userMemberCount", header: "Member Count", size: 120 },
+      
     ],
     []
   );

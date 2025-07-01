@@ -96,14 +96,73 @@ function Dashboard() {
     );
   };
 
-  const deleteCard = (id) => {
+  /*const deleteCard = (id) => {
     setCards((prevCards) => prevCards.filter((card) => card.id !== id));
+     // Supprimer aussi le widget correspondant (sinon il revient via useEffect de DropZone)
+  
+     setWidgets((prevWidgets) =>
+      prevWidgets.filter((widget) => {
+        // Trouver une carte liée au widget
+        const matchingCard = cards.find((card) => card.id === id);
+        if (!matchingCard) return true;
+
+        // Exclure le widget qui correspond à celui supprimé
+        return widget.widgetType !== matchingCard.name && widget.id !== matchingCard.data?.id;
+      })
+    );
+  };*/
+  const deleteCard = (cardId) => {
+   // const deletedCard = cards.find((card) => card.id === cardId);
+    setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+
+    
+   // if (deletedCard?.data?.id) {
+   //   setWidgets((prevWidgets) =>
+   //     prevWidgets.filter((widget) => widget.id !== deletedCard.data.id)
+          
+          //{
+        /*  // Trouver une carte liée au widget
+        const matchingCard = cards.find((card) => card.id === cardId);
+        if (!matchingCard) return true;
+
+        // Exclure le widget qui correspond à celui supprimé
+        return widget.widgetType !== matchingCard.name && widget.id !== matchingCard.data?.id;
+        })
+        */
+   //   );
+   // }
   };
 
   //fonction pour récuperer les données du widget
   const handleWidgetSubmit = (widgetData) => {
+
+    const offsetX = 30;     // Espace horizontal entre les cartes
+    const offsetY = 30;     // Espace vertical entre les cartes
+    const cardsPerRow = 4;  // Nombre de cartes par ligne
+    const baseX = 100;      // Position de départ horizontale
+    const baseY = 100;      // Position de départ verticale
+
+    const index = cards.length;
+
+    // Calcule la position sur une "grille"
+    const col = index % cardsPerRow;
+    const row = Math.floor(index / cardsPerRow);
+
+    const newLeft = baseX + col * (400 + offsetX);   // 400 = largeur de carte
+    const newTop = baseY + row * (250 + offsetY);    // 250 = hauteur de carte
     //console.log("Données du widget recues dans le parent : ", widgetData);
-    setWidgets((prevWidgets) => [...prevWidgets, widgetData]);
+    //setWidgets((prevWidgets) => [...prevWidgets, widgetData]);
+    const newCard = {
+      id: `${widgetData.widgetType}-${Date.now()}`,
+      name: widgetData.widgetType,
+      initialLeft: newLeft,
+      initialTop: newTop,
+      width: 400,
+      height: 250,
+      componentName: widgetData.widgetType,
+      data: widgetData,
+    };
+    setCards((prev) => [...prev, newCard]);
   };
 
   return (

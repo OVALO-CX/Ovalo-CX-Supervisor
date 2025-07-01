@@ -50,7 +50,7 @@ import { formControlClasses } from "@mui/material";
         // 🔥 Envoyer les données à `ResizableCard`
        
         
-        if (onDataReceived) {
+        if (onDataReceived && formattedData.length > 0) {
           onDataReceived(formattedData);
         }
         

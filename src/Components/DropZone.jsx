@@ -11,10 +11,20 @@ const DropZone = ({ cards, moveCard, resizeCard, deleteCard, onAddCard, onRefres
   const dropZoneRef = useRef(null);
 
   // 🔹 Ajout automatique des Widgets soumis par `WidgetMenu`
-  useEffect(() => {
+  /*useEffect(() => {
     widgets.forEach((widget, index) => {
+
+      //const alreadyExists = cards.some((card) => card.data?.id === widget.id);
+      const alreadyExists = cards.some(
+        (card) => card.data?.id === widget.id);// || card.name === widget.widgetType);
+      
+      if (!alreadyExists) {
+    
       const newCard = {
-        id: cards.length + index + 1,
+        //id: cards.length + index + 1,
+        //id: Date.now() + index, // Utilisation de Date.now() pour un ID unique                  
+        //id: `${widget.widgetType}-${Date.now() + index}`,
+        id: `${widget.widgetType}-${widget.id}`, // ID unique basé sur widget
         name: widget.widgetType,
         initialLeft: snapToGrid(50 + index * 50), // Évite de superposer les cartes
         initialTop: snapToGrid(50 + index * 50),
@@ -24,9 +34,10 @@ const DropZone = ({ cards, moveCard, resizeCard, deleteCard, onAddCard, onRefres
         data: widget, // 🔥 Ajout des données du widget
       };
       onAddCard(newCard);
+    }
     });
-  }, [widgets]); // 📌 Réagit aux changements des widgets
-
+  }, [widgets, cards]); // 📌 Réagit aux changements des widgets
+*/
   const [, drop] = useDrop({
     accept: "CARD",
     drop: (item, monitor) => {
@@ -35,7 +46,8 @@ const DropZone = ({ cards, moveCard, resizeCard, deleteCard, onAddCard, onRefres
       const top = snapToGrid(dropOffset.y);
 
       const newCard = {
-        id: cards.length + 1,
+        //id: cards.length + 1,
+        id: `${item.name}-${Date.now()}`, // ID unique
         name: item.name,
         initialLeft: left,
         initialTop: top,

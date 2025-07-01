@@ -3,6 +3,9 @@ import { useDrag } from "react-dnd";
 import { Card, CardContent, Typography } from "@mui/joy";
 import { ExportButton, RefreshButton, DeleteButton, ResizeButton } from "./IconButton";
 import GetUserTable from '../UserTable'; // Import your component here
+import GetQueueTable from '../QueueTable';
+import GetUserPie from '../UserPie'; // Import your UserPie component
+import QueuePie from '../QueuePie'; // Import your QueuePie component
 //import AuthToken from '../AuthToken';
 
 const GRID_SIZE = 20;
@@ -26,6 +29,7 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
     const [ tableData, setTableData ] = useState([]);
     //const [ tableColumns, setTableColumns ] = useState([]);
     //const [ visibleColumns, setVisibleColumns ] = useState([]);
+    const [zIndex, setZIndex] = useState(1);
 
   const [, drag] = useDrag({
     type: "CARD",
@@ -81,6 +85,8 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
     if (resizingRef.current) return;
     event.preventDefault();
 
+    setZIndex(1000);
+
     const startX = event.clientX;
     const startY = event.clientY;
     const startLeft = positionRef.current.left;
@@ -120,10 +126,29 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
       setTableData(receivedData);
     };
 
+  // 🔄 Rétablir zIndex après 1s (optionnel)
+  useEffect(() => {
+    if (zIndex > 1) {
+      const timeout = setTimeout(() => setZIndex(1), 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [zIndex]);
+
     useEffect(() => {
+      if (tableData.length > 0) {
+        console.log("✅ Données prêtes pour export :", tableData);
+      } else {
+        console.log("⏳ Données non encore disponibles pour export.");
+      }
+      
       console.log("📊 Données mises à jour dans ResizableCard:", tableData);
+      console.log(data?.data.widgetType);
+      console.log(data?.data.objectType);
     }, [tableData]);
 
+    useEffect(() => {
+      console.log("📦 Données exportables reçues :", tableData);
+    }, [tableData]);
 
 /*      // 🔹 Vérification que `tableData` est bien mis à jour
       useEffect(() => {
@@ -199,6 +224,7 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
         width: cardWidth,
         height: cardHeight,
         cursor: "grab",
+        zIndex: zIndex,
       }}
     >
       <Card
@@ -218,15 +244,51 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
 
 
 {/* 📌 Affichage du bon composant selon `componentName` */}
-{data?.data.widgetType === "grid" ? (
+{/*data?.data.widgetType === "grid" ? (
+          
             <GetUserTable data={data}/>
           ) : (
             <Typography>Aucun contenu disponible</Typography>
-          )}
+          )*/}
+
+{ data?.data.widgetType === "pie" ? (
+  data?.data.objectType === "agent" ? (
+      <GetUserPie data={tableData} 
+      token={token}
+      expiryDate={expiryDate}
+      fontSize={fontSize}
+      onDataReceived={handleDataReceived}/>
+    
+) : (
+    <Typography>PieChart non disponible pour ce type</Typography>
+  )
+) : (
+  <Typography>Aucun contenu disponible</Typography>
+)}
+
+{data?.data.widgetType === "grid" ? (
+  data?.data.objectType === "agent" ? (
+    <GetUserTable data={data} 
+      token={token}
+      expiryDate={expiryDate}
+      fontSize={fontSize}
+      onDataReceived={handleDataReceived}/>
+  ) : data?.data.objectType === "queue" ? (
+    <GetQueueTable data={data} 
+      token={token}
+      expiryDate={expiryDate}
+      fontSize={fontSize}
+      onDataReceived={handleDataReceived}/>
+  ) : (
+    <Typography>Type d'objet inconnu</Typography>
+  )
+) : (
+  <Typography>Aucun contenu disponible</Typography>
+)}
 
 
         <div style={{ position: "absolute", top: 0, right: 0, display: "flex", alignItems: "flex-start", flexDirection: "row", }}>
-          <ExportButton data={tableData} />          
+          <ExportButton data={tableData}/>          
           {/*<ExportButton onClick={() => onExport(id)}/>*/}
           {/*<ExportButton data={tableData} columns={tableColumns} />*/}
           {/*<ExportButton data={tableData} columns={visibleColumns} />*/}
