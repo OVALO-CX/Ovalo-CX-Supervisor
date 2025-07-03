@@ -32,7 +32,7 @@ import { formControlClasses } from "@mui/material";
           }
         );
 
-        console.log("✅ Réponse reçue dans QueueTable :", response.data);
+        console.log("✅ Réponse reçue dans UserTable :", response.data);
         //setData(response.data.entities.map(user => ({
         const formattedData = response.data.entities.map((user) => ({
           ...user,

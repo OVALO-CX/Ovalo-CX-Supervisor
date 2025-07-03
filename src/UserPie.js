@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useAuth } from './context/AuthProvider'; // 🔥 Import du contexte d'authentificatio  n
 import BasicPie from './Components/PieChart';
 import Grid from '@mui/joy/Grid';
 
-function GetUserPie({ token, expiryDate }) {
+function GetUserPie({ onDataReceived }) {
+  const { token } = useAuth(); 
   const [data1, setData1] = useState([]);
   const [data2, setData2] = useState([]);
 
 
-  useEffect(() => {
+ /* useEffect(() => {
     setData1([
       { id: 0, value: 10, label: 'Available', color: 'green' },
       { id: 1, value: 5, label: 'Busy', color: 'orange' },
       { id: 2, value: 2, label: 'Offline', color: 'gray' },
     ]);
-  }, []);
+  }, []);*/
   
 
   useEffect(() => {
-    const fetchData = async () => {
+
       if (!token){
         console.warn("❌ Token expiré ou manquant.");
         return;
       }
-
+    const fetchData = async () => {
       try {
         const response = await axios.get(
           'https://api.mypurecloud.de/api/v2/users?pageSize=200&pageNumber=1&expand=presence,routingStatus',
@@ -33,6 +35,8 @@ function GetUserPie({ token, expiryDate }) {
         );
 
         const users = response.data.entities;
+
+        console.log("📊 Données pieChart (juste apres appel API) :", users);
 
         // Regroupement par statut de présence
         const countByStatus = (status) =>
@@ -52,6 +56,9 @@ function GetUserPie({ token, expiryDate }) {
         
 
         setData1(pieChartData1);
+        if (onDataReceived) {
+          onDataReceived(pieChartData1);
+        }   
 
         const onQueue = users.filter(user => user.routingStatus?.status !== 'OFF_QUEUE').length;
         const offQueue = users.filter(user => user.routingStatus?.status === 'OFF_QUEUE').length;
@@ -66,14 +73,15 @@ function GetUserPie({ token, expiryDate }) {
     };
 
     fetchData();
-  }, [token, expiryDate]);
+  }, [token]);
 
   return (
-    <Grid item xs={6} sm={6} md={6}>
-      <div style={{ display: 'flex', justifyContent: 'center' }}>
+    //<Grid item xs={6} sm={6} md={6}>
+      <div>
+      {/*<div style={{ display: 'flex', justifyContent: 'center' }}>*/}
         <BasicPie data1={data1} data2={data2} title="User Availability" />
       </div>
-    </Grid>
+    //</Grid>
   );
 }
 

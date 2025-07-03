@@ -2,34 +2,37 @@ import React, { useRef, useState, useEffect } from "react";
 import { useDrag } from "react-dnd";
 import { Card, CardContent, Typography } from "@mui/joy";
 import { ExportButton, RefreshButton, DeleteButton, ResizeButton } from "./IconButton";
-import GetUserTable from '../UserTable'; // Import your component here
-import GetQueueTable from '../QueueTable';
-import GetUserPie from '../UserPie'; // Import your UserPie component
-import QueuePie from '../QueuePie'; // Import your QueuePie component
-//import AuthToken from '../AuthToken';
+import GetUserTable from "../UserTable";
+import GetQueueTable from "../QueueTable";
+import GetUserPie from "../UserPie";
+//import GetQueuePie from "../GetQueuePie"; // Ajoute-le si tu as un PieChart pour queues
 
 const GRID_SIZE = 20;
-
 const snapToGrid = (value) => Math.round(value / GRID_SIZE) * GRID_SIZE;
 
-const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height, 
-  onMove, onResize, onDelete, onRefresh, onExport, data, token }) => {
+const DraggableResizableCard = ({
+  id,
+  initialLeft,
+  initialTop,
+  width,
+  height,
+  onMove,
+  onResize,
+  onDelete,
+  onRefresh,
+  onExport,
+  data,
+  token,
+  expiryDate
+}) => {
+  const [cardWidth, setCardWidth] = useState(width);
+  const [cardHeight, setCardHeight] = useState(height);
+  const [fontSize, setFontSize] = useState(16);
+  const [tableData, setTableData] = useState([]);
+  const [zIndex, setZIndex] = useState(1);
 
-    //const [token, setToken] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [cardWidth, setCardWidth] = useState(width);
-    const [cardHeight, setCardHeight] = useState(height);
-    const [isFirstCard, setIsFirstCard] = useState(false);
-
-    const resizingRef = useRef(false);
-    const positionRef = useRef({ left: initialLeft, top: initialTop });
-    const [fontSize, setFontSize] = useState(16);
-
-    // Etat pour stocker les données récupérées
-    const [ tableData, setTableData ] = useState([]);
-    //const [ tableColumns, setTableColumns ] = useState([]);
-    //const [ visibleColumns, setVisibleColumns ] = useState([]);
-    const [zIndex, setZIndex] = useState(1);
+  const resizingRef = useRef(false);
+  const positionRef = useRef({ left: initialLeft, top: initialTop });
 
   const [, drag] = useDrag({
     type: "CARD",
@@ -37,35 +40,19 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
     canDrag: () => !resizingRef.current,
   });
 
-  useEffect(() => {
-    // Set the first card position at top left corner
-    if (isFirstCard) {
-      positionRef.current.left = 0;
-      positionRef.current.top = 0;
-      onMove(id, 0, 0);
-    }
-  }, [isFirstCard]);
-
-
-  // Function to receive the token
-  /*const handleTokenReceived = ({access_token, token_expiry}) => {
-    setToken(access_token);
-    setExpiryDate(token_expiry);
-  };*/
-
   const handleMouseDownResize = (event) => {
     event.stopPropagation();
     resizingRef.current = true;
+    setZIndex(1000);
 
     const startX = event.clientX;
     const startY = event.clientY;
-    const startWidth = width;
-    const startHeight = height;
+    const startWidth = cardWidth;
+    const startHeight = cardHeight;
 
     const handleMouseMove = (moveEvent) => {
       const newWidth = snapToGrid(startWidth + moveEvent.clientX - startX);
       const newHeight = snapToGrid(startHeight + moveEvent.clientY - startY);
-
       setCardWidth(newWidth);
       setCardHeight(newHeight);
       onResize(id, newWidth, newHeight);
@@ -84,7 +71,6 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
   const handleMouseDownDrag = (event) => {
     if (resizingRef.current) return;
     event.preventDefault();
-
     setZIndex(1000);
 
     const startX = event.clientX;
@@ -102,6 +88,7 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
     const handleMouseUp = () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      setZIndex(2);
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -109,24 +96,13 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
   };
 
   const handleResizeFont = (newFontSize) => {
-    setFontSize(newFontSize); // Update the local font size
+    setFontSize(newFontSize);
   };
 
- /* //Fonction pour recevoir les données de GetUserTable
-  const handleDataReceived = (data, columns) => {
-    console.log("📊 Données reçues dans ResizableCard :", data);
-    setTableData(data);
-    setTableColumns(columns);
-    setVisibleColumns(columns);
-  } 
-    */
-     // 🔹 Fonction pour recevoir les données complètes
-    const handleDataReceived = (receivedData) => {
-      console.log("📥 Données reçues dans ResizableCard:", receivedData);
-      setTableData(receivedData);
-    };
+  const handleDataReceived = (receivedData) => {
+    setTableData(receivedData);
+  };
 
-  // 🔄 Rétablir zIndex après 1s (optionnel)
   useEffect(() => {
     if (zIndex > 1) {
       const timeout = setTimeout(() => setZIndex(1), 1000);
@@ -134,83 +110,56 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
     }
   }, [zIndex]);
 
-    useEffect(() => {
-      if (tableData.length > 0) {
-        console.log("✅ Données prêtes pour export :", tableData);
-      } else {
-        console.log("⏳ Données non encore disponibles pour export.");
-      }
-      
-      console.log("📊 Données mises à jour dans ResizableCard:", tableData);
-      console.log(data?.data.widgetType);
-      console.log(data?.data.objectType);
-    }, [tableData]);
-
-    useEffect(() => {
-      console.log("📦 Données exportables reçues :", tableData);
-    }, [tableData]);
-
-/*      // 🔹 Vérification que `tableData` est bien mis à jour
-      useEffect(() => {
-        console.log("📊 Données mises à jour dans ResizableCard:", tableData);
-        console.log("📊 Colonnes visibles mises à jour dans ResizableCard:", visibleColumns);
-      }, [tableData, visibleColumns]);
-*/
-    // 🔹 Fonction pour recevoir les données et colonnes visibles
-    /*
-    const handleDataReceived = (receivedData, receivedColumns) => {
-      console.log("📥 Données reçues dans ResizableCard:", receivedData);
-      console.log("📥 Colonnes visibles reçues dans ResizableCard:", receivedColumns);
-      
-      if (receivedColumns.length > 0) { // 🔥 Vérifier si les colonnes ne sont pas vides
-        setTableData(receivedData);
-        setVisibleColumns(receivedColumns);
-      } else {
-        console.warn("⚠️ Aucune colonne visible reçue, les données ne seront pas exportées.");
-      }
-    };
-    */
-
-    /*
-    useEffect(() => {
-      console.log("📊 Données mises à jour dans ResizableCard:", tableData);
-      console.log("📊 Colonnes visibles mises à jour dans ResizableCard:", visibleColumns);
-    }, [tableData, visibleColumns]);
-    */
-
-
-  // Dynamically select the component to render based on the card data
   const renderComponent = () => {
-    if (!data || !data.componentName) 
-      return <Typography level="body1">No data provided</Typography>;
-    
-    switch (data.componentName) {
-      case 'User Table':
-        return (
-        <>
-          {/*<AuthToken onTokenReceived={handleTokenReceived} />*/}
-          <div style={{ 
-            overflow: "auto", 
-            maxWidth: "100%", 
-            maxHeight: "calc(50% - 80px)" 
-          }}>
-            
-          {/*<GetUserTable data={data} token={token} expiryDate={expiryDate} fontSize={fontSize} onDataReceived={handleDataReceived}/>;*/}
-          <GetUserTable data={data} token={token} expiryDate={expiryDate} fontSize={fontSize} onDataReceived={handleDataReceived}/>;
-          </div>
-        </>
-        );
-      case 'User PieChart':
-        return <Typography level="body1">le contenu du PieChart</Typography>;
-      case 'User Data2':
-        return <Typography level="body1">le contenu du User Data2</Typography>;
-      case 'User Data3':
-        return <Typography level="body1">le contenu du User Data3</Typography>;
+    const { widgetType, objectType } = data?.data || {};
 
-        // Add other cases here for other components
-      default:
-        return <Typography level="body1">No component found</Typography>;
+    if (widgetType === "grid") {
+      if (objectType === "agent") {
+        return (
+          <GetUserTable
+            data={data}
+            token={token}
+            expiryDate={expiryDate}
+            fontSize={fontSize}
+            onDataReceived={handleDataReceived}
+          />
+        );
+      } else if (objectType === "queue") {
+        return (
+          <GetQueueTable
+            data={data}
+            token={token}
+            expiryDate={expiryDate}
+            fontSize={fontSize}
+            onDataReceived={handleDataReceived}
+          />
+        );
+      }
     }
+
+    if (widgetType === "pie") {
+      if (objectType === "agent") {
+        return (
+          <GetUserPie
+          data={data}
+            token={token}
+            expiryDate={expiryDate}
+            onDataReceived={handleDataReceived}
+          />
+        );
+      } else if (objectType === "queue") {
+        return (
+          <GetUserPie
+          data={data}
+            token={token}
+            expiryDate={expiryDate}
+            onDataReceived={handleDataReceived}
+          />
+        );
+      }
+    }
+
+    return <Typography>Aucun contenu disponible</Typography>;
   };
 
   return (
@@ -224,7 +173,7 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
         width: cardWidth,
         height: cardHeight,
         cursor: "grab",
-        zIndex: zIndex,
+        zIndex,
       }}
     >
       <Card
@@ -239,68 +188,45 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
           overflow: "hidden",
         }}
       >
-        <CardContent sx={{ display: "flex", justifyContent: "space-between", fontSize: `${fontSize}px`, }}>
-          <Typography level="h6">{data?.name || `Card ${id}`}</Typography>
+        <CardContent
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: `${fontSize}px`,
+          }}
+        >
+          <Typography level="h6">
+            {data?.name || `Card ${id}`}
+          </Typography>
 
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              right: 0,
+              display: "flex",
+              alignItems: "flex-start",
+              flexDirection: "row",
+            }}
+          >
+            {tableData.length > 0 ? (
+              <ExportButton data={tableData} />
+            ) : (
+              <Typography
+                level="body2"
+                sx={{ fontStyle: "italic", color: "gray", mr: 1 }}
+              >
+                Chargement...
+              </Typography>
+            )}
+            <RefreshButton onClick={() => onRefresh(id)} />
+            <ResizeButton onResize={handleResizeFont} />
+            <DeleteButton onClick={() => onDelete(id)} />
+          </div>
 
-{/* 📌 Affichage du bon composant selon `componentName` */}
-{/*data?.data.widgetType === "grid" ? (
-          
-            <GetUserTable data={data}/>
-          ) : (
-            <Typography>Aucun contenu disponible</Typography>
-          )*/}
-
-{ data?.data.widgetType === "pie" ? (
-  data?.data.objectType === "agent" ? (
-      <GetUserPie data={tableData} 
-      token={token}
-      expiryDate={expiryDate}
-      fontSize={fontSize}
-      onDataReceived={handleDataReceived}/>
-    
-) : (
-    <Typography>PieChart non disponible pour ce type</Typography>
-  )
-) : (
-  <Typography>Aucun contenu disponible</Typography>
-)}
-
-{data?.data.widgetType === "grid" ? (
-  data?.data.objectType === "agent" ? (
-    <GetUserTable data={data} 
-      token={token}
-      expiryDate={expiryDate}
-      fontSize={fontSize}
-      onDataReceived={handleDataReceived}/>
-  ) : data?.data.objectType === "queue" ? (
-    <GetQueueTable data={data} 
-      token={token}
-      expiryDate={expiryDate}
-      fontSize={fontSize}
-      onDataReceived={handleDataReceived}/>
-  ) : (
-    <Typography>Type d'objet inconnu</Typography>
-  )
-) : (
-  <Typography>Aucun contenu disponible</Typography>
-)}
-
-
-        <div style={{ position: "absolute", top: 0, right: 0, display: "flex", alignItems: "flex-start", flexDirection: "row", }}>
-          <ExportButton data={tableData}/>          
-          {/*<ExportButton onClick={() => onExport(id)}/>*/}
-          {/*<ExportButton data={tableData} columns={tableColumns} />*/}
-          {/*<ExportButton data={tableData} columns={visibleColumns} />*/}
-          <RefreshButton onClick={() => onRefresh(id)} />
-          <ResizeButton onResize={handleResizeFont} />
-          <DeleteButton onClick={() => onDelete(id)} />
-        </div>
-
-        <div style={{}}>
-          {renderComponent()}
-        </div>
+          <div style={{ width: "100%", paddingBottom: "20px" }}>{renderComponent()}</div>
         </CardContent>
+
         <div
           style={{
             position: "absolute",
@@ -310,6 +236,7 @@ const DraggableResizableCard = ({ id, initialLeft, initialTop, width, height,
             height: "15px",
             cursor: "nwse-resize",
             backgroundColor: "rgba(0, 0, 0, 0.2)",
+            zIndex: 1001,
           }}
           onMouseDown={handleMouseDownResize}
         />
